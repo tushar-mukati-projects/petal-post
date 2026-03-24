@@ -1,6 +1,6 @@
 "use client";
 
-import type { WrapperType } from "@/types/bouquet";
+import type { WrapperType } from "@/types/floral";
 import { WRAPPER_COMPONENTS } from "@/flowers/wrappers";
 
 interface WrapperLayerProps {

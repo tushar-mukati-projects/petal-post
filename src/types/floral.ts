@@ -1,13 +1,42 @@
-import type { FlowerType, FlowerMode } from "./flower";
+import type { FlowerType } from "./flower";
 import type { ArrangementData } from "./arrangement";
 
 export type OccasionType = "none" | "birthday" | "valentine" | "thankyou" | "getwell" | "congrats";
 
-export type WrapperType = "paper" | "vase" | "basket" | "ribbon";
+export type WrapperType =
+  | "paper"
+  | "vase"
+  | "basket"
+  | "ribbon"
+  | "foliage"
+  | "tissue"
+  | "jar"
+  | "pot"
+  | "giftbox"
+  | "bucket"
+  | "teacup"
+  | "envelope"
+  | "boot"
+  | "sunhat"
+  | "paperbag"
+  | "crate"
+  | "cone"
+  | "mug"
+  | "lantern"
+  | "nest"
+  | "shell"
+  | "heartbox"
+  | "cloud"
+  | "wagon"
+  | "bicycle"
+  | "macrame"
+  | "kimono"
+  | "terrarium"
+  | "origami"
+  | "vintage";
 
-export interface Bouquet {
+export interface Floral {
   id: string;
-  mode: FlowerMode;
   occasion: OccasionType;
   flowers: FlowerType[];
   arrangement: ArrangementData;
@@ -15,12 +44,10 @@ export interface Bouquet {
   cardTo: string;
   cardMessage: string;
   cardFrom: string;
-  showInGarden: boolean;
   createdAt: string;
 }
 
-export interface CreateBouquetPayload {
-  mode: FlowerMode;
+export interface CreateFloralPayload {
   occasion: OccasionType;
   flowers: FlowerType[];
   arrangement: ArrangementData;
@@ -28,13 +55,4 @@ export interface CreateBouquetPayload {
   cardTo: string;
   cardMessage: string;
   cardFrom: string;
-  showInGarden?: boolean;
-}
-
-export interface GardenBouquetResponse {
-  creations: Omit<Bouquet, "cardTo" | "cardMessage" | "cardFrom">[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
 }

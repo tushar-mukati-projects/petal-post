@@ -2,7 +2,7 @@
 
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { GardenGrid } from "@/components/garden/GardenGrid";
+import { CollectionGrid } from "@/components/collections/CollectionGrid";
 
 export default function CollectionsPage() {
   return (
@@ -15,11 +15,11 @@ export default function CollectionsPage() {
               Collections
             </h1>
             <p className="text-muted-foreground max-w-md mx-auto">
-              A peek at the beautiful creations people have shared with the world
+              A peek at the beautiful Florals people have shared with the world
             </p>
           </div>
 
-          <GardenGrid />
+          <CollectionGrid />
         </div>
       </main>
       <Footer />

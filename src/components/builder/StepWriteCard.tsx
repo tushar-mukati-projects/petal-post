@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useBouquetStore } from "@/stores/useBouquetStore";
+import { useFloralStore } from "@/stores/useFloralStore";
 import { OCCASION_MAP } from "@/lib/occasions";
 import { getRandomCardMessage } from "@/lib/cardMessages";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import { Sparkles } from "lucide-react";
 
 export function StepWriteCard() {
   const { occasion, cardTo, cardMessage, cardFrom, setCardTo, setCardMessage, setCardFrom } =
-    useBouquetStore();
+    useFloralStore();
 
   const [fadeIn, setFadeIn] = useState(false);
 
@@ -30,7 +30,7 @@ export function StepWriteCard() {
     <div className="space-y-8">
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-heading font-extrabold text-foreground">Write your card</h2>
-        <p className="text-muted-foreground">Add a personal message to your flowers</p>
+        <p className="text-muted-foreground">Add a personal message to your Floral</p>
       </div>
 
       {/* Generate random message */}

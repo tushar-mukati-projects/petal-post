@@ -1,101 +1,72 @@
 "use client";
 
 import { create } from "zustand";
-import type { FlowerType, FlowerMode } from "@/types/flower";
-import type { ArrangementData } from "@/types/arrangement";
-import type { OccasionType, WrapperType } from "@/types/bouquet";
-import { generateArrangement, newSeed } from "@/lib/arrangement";
+import type { FlowerType } from "@/types/flower";
+import type { ArrangementData, ArrangementType } from "@/types/arrangement";
+import type { OccasionType, WrapperType } from "@/types/floral";
+import { createArrangement } from "@/lib/arrangement";
 import { OCCASION_MAP } from "@/lib/occasions";
+import { ARRANGEMENT_TYPES, ALL_WRAPPERS, MIN_FLOWERS, MAX_FLOWERS } from "@/lib/constants";
 
-interface BouquetState {
-  // Wizard navigation
+interface FloralState {
   currentStep: number;
-  mode: FlowerMode;
-
-  // Step 1: Occasion
   occasion: OccasionType;
-
-  // Step 2: Flower selection
   selectedFlowers: FlowerType[];
-
-  // Step 3: Arrangement & wrapper
   arrangement: ArrangementData | null;
-  arrangementSeed: number;
   wrapperTheme: WrapperType;
-
-  // Step 4: Card
   cardTo: string;
   cardMessage: string;
   cardFrom: string;
 
-  // Actions: Navigation
-  setMode: (mode: FlowerMode) => void;
   nextStep: () => void;
   prevStep: () => void;
   goToStep: (step: number) => void;
-
-  // Actions: Occasion
   setOccasion: (occasion: OccasionType) => void;
-
-  // Actions: Flower selection
   addFlower: (flower: FlowerType) => void;
   removeFlower: (flower: FlowerType) => void;
   removeFlowerAtIndex: (index: number) => void;
   clearFlowers: () => void;
-
-  // Actions: Arrangement
   shuffleArrangement: () => void;
   cycleWrapper: () => void;
   setWrapper: (wrapper: WrapperType) => void;
-
-  // Actions: Card
   setCardTo: (value: string) => void;
   setCardMessage: (value: string) => void;
   setCardFrom: (value: string) => void;
-
-  // Actions: Reset
   reset: () => void;
-
-  // Computed
   flowerCount: () => number;
   canProceedFromStep: (step: number) => boolean;
 }
 
-const WRAPPER_ORDER: WrapperType[] = ["paper", "vase", "basket", "ribbon"];
+const TOTAL_STEPS = 5;
+const LAST_STEP = TOTAL_STEPS - 1;
+const PICK_BLOOMS_STEP = 1;
 
-export const useBouquetStore = create<BouquetState>((set, get) => ({
+export const useFloralStore = create<FloralState>((set, get) => ({
   currentStep: 0,
-  mode: "color",
   occasion: "none",
   selectedFlowers: [],
   arrangement: null,
-  arrangementSeed: newSeed(),
-  wrapperTheme: "paper",
+  wrapperTheme: "tissue",
   cardTo: "",
   cardMessage: "",
   cardFrom: "",
 
-  setMode: (mode) => set({ mode }),
-
   nextStep: () => {
-    const { currentStep, selectedFlowers, arrangementSeed } = get();
-    // Generate arrangement when moving from step 1 (pick blooms) to step 2 (customize)
-    if (currentStep === 1 && selectedFlowers.length >= 6) {
-      const arrangement = generateArrangement(selectedFlowers, arrangementSeed);
+    const { currentStep, selectedFlowers } = get();
+    if (currentStep === PICK_BLOOMS_STEP && selectedFlowers.length >= MIN_FLOWERS) {
+      const arrangement = createArrangement(selectedFlowers, "triangle");
       set({ currentStep: currentStep + 1, arrangement });
     } else {
-      set({ currentStep: Math.min(currentStep + 1, 4) });
+      set({ currentStep: Math.min(currentStep + 1, LAST_STEP) });
     }
   },
 
   prevStep: () => set((state) => ({ currentStep: Math.max(state.currentStep - 1, 0) })),
-
-  goToStep: (step) => set({ currentStep: Math.max(0, Math.min(step, 4)) }),
+  goToStep: (step) => set({ currentStep: Math.max(0, Math.min(step, LAST_STEP)) }),
 
   setOccasion: (occasion) => {
     const occasionData = OCCASION_MAP[occasion];
     const suggested = occasionData?.suggestedFlowers || [];
-    // Pre-select first 5 suggested flowers when switching occasion
     const current = get().selectedFlowers;
     if (current.length === 0 && suggested.length > 0) {
       const preSelected = suggested.slice(0, Math.min(suggested.length, 5));
@@ -107,7 +78,7 @@ export const useBouquetStore = create<BouquetState>((set, get) => ({
 
   addFlower: (flower) =>
     set((state) => {
-      if (state.selectedFlowers.length >= 10) return state;
+      if (state.selectedFlowers.length >= MAX_FLOWERS) return state;
       return { selectedFlowers: [...state.selectedFlowers, flower] };
     }),
 
@@ -131,52 +102,55 @@ export const useBouquetStore = create<BouquetState>((set, get) => ({
 
   shuffleArrangement: () => {
     const { selectedFlowers } = get();
-    const seed = newSeed();
-    const arrangement = generateArrangement(selectedFlowers, seed);
-    set({ arrangement, arrangementSeed: seed });
+    const randomType: ArrangementType =
+      ARRANGEMENT_TYPES[Math.floor(Math.random() * ARRANGEMENT_TYPES.length)];
+    const shuffled = [...selectedFlowers].sort(() => Math.random() - 0.5);
+    set({ arrangement: createArrangement(shuffled, randomType) });
   },
 
   cycleWrapper: () =>
     set((state) => {
-      const idx = WRAPPER_ORDER.indexOf(state.wrapperTheme);
-      const next = WRAPPER_ORDER[(idx + 1) % WRAPPER_ORDER.length];
-      return { wrapperTheme: next };
+      const filtered = ALL_WRAPPERS.filter((w) => w !== state.wrapperTheme);
+      return { wrapperTheme: filtered[Math.floor(Math.random() * filtered.length)] };
     }),
 
   setWrapper: (wrapper) => set({ wrapperTheme: wrapper }),
-
   setCardTo: (value) => set({ cardTo: value }),
   setCardMessage: (value) => set({ cardMessage: value }),
   setCardFrom: (value) => set({ cardFrom: value }),
 
-  reset: () =>
+  reset: () => {
+    const occasionData = OCCASION_MAP["none"];
+    const suggested = occasionData?.suggestedFlowers || [];
+    const preSelected = suggested.slice(0, Math.min(suggested.length, 5));
     set({
       currentStep: 0,
-      mode: "color",
       occasion: "none",
-      selectedFlowers: [],
+      selectedFlowers: preSelected,
       arrangement: null,
-      arrangementSeed: newSeed(),
-      wrapperTheme: "paper",
+      wrapperTheme: "tissue",
       cardTo: "",
       cardMessage: "",
       cardFrom: "",
-    }),
+    });
+  },
 
   flowerCount: () => get().selectedFlowers.length,
 
   canProceedFromStep: (step) => {
     const state = get();
     switch (step) {
-      case 0: // Occasion - always can proceed
+      case 0:
         return true;
-      case 1: // Pick blooms - need 6-10
-        return state.selectedFlowers.length >= 6 && state.selectedFlowers.length <= 10;
-      case 2: // Customize - always can proceed if we have arrangement
+      case 1:
+        return (
+          state.selectedFlowers.length >= MIN_FLOWERS && state.selectedFlowers.length <= MAX_FLOWERS
+        );
+      case 2:
         return state.arrangement !== null;
-      case 3: // Write card - at least message should be written
+      case 3:
         return state.cardMessage.trim().length > 0;
-      case 4: // Preview - always can proceed
+      case 4:
         return true;
       default:
         return false;

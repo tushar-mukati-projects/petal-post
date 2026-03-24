@@ -2,11 +2,11 @@
 
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
-import type { Bouquet } from "@/types/bouquet";
+import type { Floral } from "@/types/floral";
 
-export function useGetBouquet(id: string | undefined) {
-  return useQuery<Bouquet>({
-    queryKey: ["creation", id],
+export function useGetFloral(id: string | undefined) {
+  return useQuery<Floral>({
+    queryKey: ["floral", id],
     queryFn: async () => {
       const { data } = await api.get(`/api/creations/${id}`);
       return data;

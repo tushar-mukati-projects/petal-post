@@ -1,28 +1,32 @@
 "use client";
 
-import type { FlowerMode } from "@/types/flower";
-import type { ArrangementData } from "@/types/arrangement";
-import type { WrapperType } from "@/types/bouquet";
+import type { ArrangementData, FlowerPosition } from "@/types/arrangement";
+import { isTemplateArrangement } from "@/types/arrangement";
+import type { WrapperType } from "@/types/floral";
+import { resolvePositions } from "@/lib/arrangement";
 import { FlowerLayer } from "./FlowerLayer";
 import { WrapperLayer } from "./WrapperLayer";
 
-interface BouquetRendererProps {
+interface FloralRendererProps {
   arrangement: ArrangementData;
-  mode: FlowerMode;
   wrapper: WrapperType;
   animate?: boolean;
   className?: string;
   scale?: number;
 }
 
-export function BouquetRenderer({
+export function FloralRenderer({
   arrangement,
-  mode,
   wrapper,
   animate = false,
   className,
   scale = 1,
-}: BouquetRendererProps) {
+}: FloralRendererProps) {
+  // Resolve positions from template or use legacy positions
+  const positions: FlowerPosition[] = isTemplateArrangement(arrangement)
+    ? resolvePositions(arrangement)
+    : (arrangement as { positions: FlowerPosition[] }).positions;
+
   return (
     <div
       className={className}
@@ -35,11 +39,10 @@ export function BouquetRenderer({
       }}
     >
       {/* Flowers */}
-      {arrangement.positions.map((pos, i) => (
+      {positions.map((pos, i) => (
         <FlowerLayer
           key={`${pos.flowerId}-${pos.index}`}
           position={pos}
-          mode={mode}
           animate={animate}
           index={i}
         />

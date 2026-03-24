@@ -1,170 +1,244 @@
-export function GlassVase({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 400 200" className={className} xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        {/* Glass gradient for main body */}
-        <linearGradient id="glass-body" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#e3f2fd" stopOpacity="0.18" />
-          <stop offset="25%" stopColor="#e3f2fd" stopOpacity="0.08" />
-          <stop offset="50%" stopColor="#bbdefb" stopOpacity="0.12" />
-          <stop offset="75%" stopColor="#e3f2fd" stopOpacity="0.06" />
-          <stop offset="100%" stopColor="#e3f2fd" stopOpacity="0.16" />
-        </linearGradient>
-        {/* Water gradient */}
-        <linearGradient id="water-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#bbdefb" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#90caf9" stopOpacity="0.25" />
-        </linearGradient>
-        {/* Glass rim highlight */}
-        <linearGradient id="rim-shine" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.1" />
-          <stop offset="40%" stopColor="#ffffff" stopOpacity="0.4" />
-          <stop offset="60%" stopColor="#ffffff" stopOpacity="0.35" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.1" />
-        </linearGradient>
-      </defs>
+"use client";
 
-      {/* Vase outline / main body - rounded shape */}
-      <path
-        d="M150,18 C148,18 144,20 142,24 L142,28 C132,38 122,58 120,80 C118,102 122,130 130,155 C136,170 148,182 168,188 L232,188 C252,182 264,170 270,155 C278,130 282,102 280,80 C278,58 268,38 258,28 L258,24 C256,20 252,18 250,18 Z"
-        fill="url(#glass-body)"
-        stroke="#b0bec5"
-        strokeWidth="0.8"
-        strokeOpacity="0.5"
-      />
+import { RoughCanvas, type DrawFn } from "./RoughCanvas";
 
-      {/* Inner vase shadow for depth */}
-      <path
-        d="M152,22 C150,22 146,24 145,27 L145,30 C135,40 126,60 124,82 C122,104 126,130 133,154 C138,168 150,179 169,185 L231,185 C250,179 262,168 267,154 C274,130 278,104 276,82 C274,60 265,40 255,30 L255,27 C254,24 250,22 248,22 Z"
-        fill="none"
-        stroke="#90caf9"
-        strokeWidth="0.4"
-        strokeOpacity="0.2"
-      />
-
-      {/* Vase mouth / rim - top opening */}
-      <ellipse
-        cx="200"
-        cy="20"
-        rx="52"
-        ry="5"
-        fill="url(#rim-shine)"
-        stroke="#b0bec5"
-        strokeWidth="0.6"
-        strokeOpacity="0.4"
-      />
-      {/* Inner rim ellipse */}
-      <ellipse
-        cx="200"
-        cy="20"
-        rx="48"
-        ry="3.5"
-        fill="none"
-        stroke="#90caf9"
-        strokeWidth="0.4"
-        strokeOpacity="0.25"
-      />
-
-      {/* Vase base / bottom */}
-      <ellipse
-        cx="200"
-        cy="188"
-        rx="34"
-        ry="4"
-        fill="#e3f2fd"
-        opacity="0.15"
-        stroke="#b0bec5"
-        strokeWidth="0.5"
-        strokeOpacity="0.3"
-      />
-
-      {/* Water inside the vase */}
-      <path
-        d="M130,110 C138,106 165,104 200,104 C235,104 262,106 270,110 C278,128 280,148 270,162 C264,172 250,180 232,186 L168,186 C150,180 136,172 130,162 C122,148 122,128 130,110 Z"
-        fill="url(#water-fill)"
-      />
-
-      {/* Water level surface line */}
-      <path
-        d="M130,110 C145,106 170,104 200,104 C230,104 255,106 270,110"
-        fill="none"
-        stroke="#90caf9"
-        strokeWidth="0.8"
-        strokeOpacity="0.4"
-      />
-      {/* Water surface subtle wave */}
-      <path
-        d="M138,109 C155,112 175,108 200,110 C225,108 245,112 262,109"
-        fill="none"
-        stroke="#bbdefb"
-        strokeWidth="0.5"
-        strokeOpacity="0.3"
-      />
-
-      {/* Glass reflections - left highlight streak */}
-      <path
-        d="M140,40 C136,60 134,85 136,115 C137,135 140,155 146,170"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="3"
-        strokeLinecap="round"
-        opacity="0.22"
-      />
-      {/* Secondary left reflection */}
-      <path
-        d="M146,50 C143,65 142,80 143,100"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        opacity="0.15"
-      />
-
-      {/* Right edge reflection */}
-      <path
-        d="M264,45 C268,70 270,95 268,125 C266,145 262,160 256,172"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="2"
-        strokeLinecap="round"
-        opacity="0.18"
-      />
-
-      {/* Small highlight spots */}
-      <ellipse
-        cx="155"
-        cy="55"
-        rx="3"
-        ry="6"
-        fill="#ffffff"
-        opacity="0.25"
-        transform="rotate(-8, 155, 55)"
-      />
-      <ellipse
-        cx="252"
-        cy="65"
-        rx="2"
-        ry="4"
-        fill="#ffffff"
-        opacity="0.2"
-        transform="rotate(8, 252, 65)"
-      />
-
-      {/* Subtle refraction effect inside water */}
-      <path
-        d="M165,130 C175,126 195,128 210,125 C225,128 240,126 250,130"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="0.6"
-        opacity="0.12"
-      />
-      <path
-        d="M155,150 C170,146 190,148 210,145 C230,148 245,146 258,150"
-        fill="none"
-        stroke="#ffffff"
-        strokeWidth="0.5"
-        opacity="0.1"
-      />
-    </svg>
+const draw: DrawFn = (rc, svg) => {
+  // Base shadow underneath vase
+  svg.appendChild(
+    rc.ellipse(204, 200, 100, 10, {
+      fill: "rgba(96,125,139,0.1)",
+      fillStyle: "solid",
+      roughness: 0.8,
+      stroke: "none",
+    }),
   );
+
+  // Vase body (outer - slightly larger for glass thickness)
+  svg.appendChild(
+    rc.path(
+      "M153,42 L146,55 C138,75 133,100 133,130 L133,165 C133,182 148,195 175,198 L225,198 C252,195 267,182 267,165 L267,130 C267,100 262,75 254,55 L247,42",
+      {
+        fill: "rgba(176,190,197,0.1)",
+        fillStyle: "solid",
+        roughness: 1.4,
+        stroke: "rgba(120,144,156,0.3)",
+        strokeWidth: 0.8,
+      },
+    ),
+  );
+
+  // Vase body (main)
+  svg.appendChild(
+    rc.path(
+      "M155,42 L148,55 C140,75 135,100 135,130 L135,165 C135,182 150,195 175,198 L225,198 C250,195 265,182 265,165 L265,130 C265,100 260,75 252,55 L245,42",
+      {
+        fill: "rgba(200,230,230,0.25)",
+        fillStyle: "solid",
+        roughness: 1.4,
+        stroke: "#90a4ae",
+        strokeWidth: 1.8,
+      },
+    ),
+  );
+
+  // Thick glass rim (double ellipse for thickness)
+  svg.appendChild(
+    rc.ellipse(200, 40, 96, 14, {
+      fill: "rgba(176,190,197,0.2)",
+      fillStyle: "solid",
+      roughness: 1.8,
+      stroke: "#78909c",
+      strokeWidth: 1.2,
+    }),
+  );
+  svg.appendChild(
+    rc.ellipse(200, 42, 92, 12, {
+      fill: "rgba(200,230,230,0.35)",
+      fillStyle: "solid",
+      roughness: 1.5,
+      stroke: "#78909c",
+      strokeWidth: 1.5,
+    }),
+  );
+
+  // Water body
+  svg.appendChild(
+    rc.path(
+      "M139,120 C155,115 180,118 200,115 C220,118 245,115 261,120 L261,165 C261,180 248,192 225,195 L175,195 C152,192 139,180 139,165 Z",
+      {
+        fill: "rgba(128,203,196,0.2)",
+        fillStyle: "solid",
+        roughness: 0.8,
+        stroke: "rgba(77,182,172,0.3)",
+        strokeWidth: 0.8,
+      },
+    ),
+  );
+
+  // Water surface line
+  svg.appendChild(
+    rc.path("M142,120 C160,116 180,119 200,116 C220,119 240,116 258,120", {
+      fill: "none",
+      roughness: 2.2,
+      stroke: "rgba(77,182,172,0.4)",
+      strokeWidth: 1,
+    }),
+  );
+
+  // Second water surface ripple
+  svg.appendChild(
+    rc.path("M148,123 C165,120 185,122 200,119 C215,122 235,120 252,123", {
+      fill: "none",
+      roughness: 2,
+      stroke: "rgba(77,182,172,0.2)",
+      strokeWidth: 0.6,
+    }),
+  );
+
+  // Water ripple lines inside
+  svg.appendChild(
+    rc.path("M150,140 C165,138 185,139 200,137 C215,139 235,138 250,140", {
+      fill: "none",
+      roughness: 1.8,
+      stroke: "rgba(77,182,172,0.12)",
+      strokeWidth: 0.5,
+    }),
+  );
+  svg.appendChild(
+    rc.path("M145,155 C165,153 185,154 200,152 C215,154 235,153 255,155", {
+      fill: "none",
+      roughness: 1.8,
+      stroke: "rgba(77,182,172,0.1)",
+      strokeWidth: 0.4,
+    }),
+  );
+
+  // Stems through glass
+  [185, 200, 215].forEach((x) => {
+    svg.appendChild(
+      rc.line(x, 42, x + (x < 200 ? -3 : x > 200 ? 3 : 0), 195, {
+        roughness: 1.2,
+        stroke: "rgba(102,187,106,0.3)",
+        strokeWidth: 1.8,
+      }),
+    );
+  });
+
+  // Caustic light patterns (bright spots refracted through water)
+  svg.appendChild(
+    rc.path("M165,135 C168,132 172,134 170,138 C167,136 164,137 165,135 Z", {
+      fill: "rgba(255,255,255,0.18)",
+      fillStyle: "solid",
+      roughness: 1.5,
+      stroke: "none",
+    }),
+  );
+  svg.appendChild(
+    rc.path("M225,150 C228,147 232,149 230,153 C227,151 224,152 225,150 Z", {
+      fill: "rgba(255,255,255,0.15)",
+      fillStyle: "solid",
+      roughness: 1.5,
+      stroke: "none",
+    }),
+  );
+  svg.appendChild(
+    rc.path("M195,165 C198,162 202,164 200,168 C197,166 194,167 195,165 Z", {
+      fill: "rgba(255,255,255,0.12)",
+      fillStyle: "solid",
+      roughness: 1.5,
+      stroke: "none",
+    }),
+  );
+
+  // Glass highlight (main left reflection)
+  svg.appendChild(
+    rc.line(148, 55, 140, 170, {
+      roughness: 0.5,
+      stroke: "rgba(255,255,255,0.3)",
+      strokeWidth: 3.5,
+    }),
+  );
+
+  // Glass highlight (secondary thinner left)
+  svg.appendChild(
+    rc.line(152, 58, 144, 165, {
+      roughness: 0.4,
+      stroke: "rgba(255,255,255,0.15)",
+      strokeWidth: 1.5,
+    }),
+  );
+
+  // Glass highlight (right side subtle)
+  svg.appendChild(
+    rc.line(258, 65, 260, 155, {
+      roughness: 0.5,
+      stroke: "rgba(255,255,255,0.1)",
+      strokeWidth: 2,
+    }),
+  );
+
+  // Bubbles in water
+  [
+    { x: 175, y: 140, r: 5 },
+    { x: 220, y: 155, r: 4 },
+    { x: 195, y: 170, r: 3 },
+    { x: 210, y: 135, r: 3.5 },
+    { x: 160, y: 160, r: 2.5 },
+    { x: 235, y: 145, r: 3 },
+    { x: 185, y: 180, r: 2 },
+    { x: 245, y: 170, r: 2.5 },
+  ].forEach(({ x, y, r }) => {
+    svg.appendChild(
+      rc.circle(x, y, r * 2, {
+        fill: "rgba(255,255,255,0.12)",
+        fillStyle: "solid",
+        roughness: 1.8,
+        stroke: "rgba(128,203,196,0.3)",
+        strokeWidth: 0.4,
+      }),
+    );
+  });
+
+  // Tiny sparkle dots on glass surface
+  [
+    { x: 145, y: 80 },
+    { x: 150, y: 110 },
+    { x: 255, y: 90 },
+    { x: 260, y: 130 },
+  ].forEach(({ x, y }) => {
+    svg.appendChild(
+      rc.circle(x, y, 2, {
+        fill: "rgba(255,255,255,0.35)",
+        fillStyle: "solid",
+        roughness: 1,
+        stroke: "none",
+      }),
+    );
+  });
+
+  // Vase base (thicker for stability look)
+  svg.appendChild(
+    rc.ellipse(200, 198, 85, 10, {
+      fill: "rgba(176,190,197,0.18)",
+      fillStyle: "solid",
+      roughness: 1.2,
+      stroke: "rgba(120,144,156,0.35)",
+      strokeWidth: 1,
+    }),
+  );
+
+  // Inner base ring
+  svg.appendChild(
+    rc.ellipse(200, 197, 70, 6, {
+      fill: "rgba(200,230,230,0.1)",
+      fillStyle: "solid",
+      roughness: 1,
+      stroke: "rgba(120,144,156,0.15)",
+      strokeWidth: 0.5,
+    }),
+  );
+};
+
+export function GlassVase({ className }: { className?: string }) {
+  return <RoughCanvas className={className} draw={draw} />;
 }

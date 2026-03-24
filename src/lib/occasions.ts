@@ -1,5 +1,5 @@
 import type { FlowerType } from "@/types/flower";
-import type { OccasionType } from "@/types/bouquet";
+import type { OccasionType } from "@/types/floral";
 
 export interface OccasionTemplate {
   id: OccasionType;

@@ -1,4 +1,4 @@
-import type { OccasionType } from "@/types/bouquet";
+import type { OccasionType } from "@/types/floral";
 
 const toNames = [
   "Sunshine",
@@ -60,7 +60,7 @@ const messagesByOccasion: Record<OccasionType, string[]> = {
     "Every love song makes sense when I think of you. You are my favorite melody.",
     "My heart found its home the moment it found you. Sending you all my love today and always.",
     "Roses are classic but nothing compares to the beauty of what we share. You are my everything.",
-    "If I had a flower for every time you made me smile, I'd have an endless garden.",
+    "If I had a flower for every time you made me smile, I'd have an endless meadow.",
     "You don't just have my heart — you are my heart. Happy Valentine's Day, my love.",
     "In a world full of people, my eyes will always search for you. You are my forever valentine.",
     "Love isn't just a word when I'm with you — it's a whole universe. Thank you for being mine.",

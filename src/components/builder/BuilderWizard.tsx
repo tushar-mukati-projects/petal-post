@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { useBouquetStore } from "@/stores/useBouquetStore";
+import { useFloralStore } from "@/stores/useFloralStore";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { StepOccasion } from "./StepOccasion";
@@ -12,8 +12,7 @@ import { StepWriteCard } from "./StepWriteCard";
 import { StepPreview } from "./StepPreview";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import type { FlowerMode } from "@/types/flower";
-import type { OccasionType } from "@/types/bouquet";
+import type { OccasionType } from "@/types/floral";
 
 const STEP_LABELS = ["Occasion", "Pick Blooms", "Customize", "Write Card", "Preview"];
 
@@ -21,21 +20,17 @@ const STEPS = [StepOccasion, StepPickBlooms, StepCustomize, StepWriteCard, StepP
 
 export function BuilderWizard() {
   const searchParams = useSearchParams();
-  const { currentStep, nextStep, prevStep, setMode, setOccasion, canProceedFromStep, reset } =
-    useBouquetStore();
+  const { currentStep, nextStep, prevStep, setOccasion, canProceedFromStep, reset } =
+    useFloralStore();
 
   // Initialize from URL params
   useEffect(() => {
     reset();
-    const mode = searchParams.get("mode");
-    if (mode === "color" || mode === "mono") {
-      setMode(mode as FlowerMode);
-    }
     const occasion = searchParams.get("occasion");
     if (occasion) {
       setOccasion(occasion as OccasionType);
     }
-  }, [searchParams, setMode, setOccasion, reset]);
+  }, [searchParams, setOccasion, reset]);
 
   const canProceed = canProceedFromStep(currentStep);
   const isLastStep = currentStep === STEPS.length - 1;

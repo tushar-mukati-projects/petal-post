@@ -1,13 +1,13 @@
 "use client";
 
 import { OCCASIONS } from "@/lib/occasions";
-import type { OccasionType } from "@/types/bouquet";
-import { useBouquetStore } from "@/stores/useBouquetStore";
+import type { OccasionType } from "@/types/floral";
+import { useFloralStore } from "@/stores/useFloralStore";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export function StepOccasion() {
-  const { occasion, setOccasion } = useBouquetStore();
+  const { occasion, setOccasion } = useFloralStore();
 
   return (
     <div className="space-y-8">
@@ -15,7 +15,7 @@ export function StepOccasion() {
         <h2 className="text-2xl font-heading font-extrabold text-foreground">
           What&apos;s the occasion?
         </h2>
-        <p className="text-muted-foreground">Choose an occasion or skip for a freeform creation</p>
+        <p className="text-muted-foreground">Choose an occasion or skip for a freeform Floral</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 max-w-lg mx-auto">

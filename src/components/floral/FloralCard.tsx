@@ -2,14 +2,14 @@
 
 import { motion } from "framer-motion";
 
-interface BouquetCardProps {
+interface FloralCardProps {
   to: string;
   message: string;
   from: string;
   animate?: boolean;
 }
 
-export function BouquetCard({ to, message, from, animate = false }: BouquetCardProps) {
+export function FloralCard({ to, message, from, animate = false }: FloralCardProps) {
   const content = (
     <div className="bg-white rounded-2xl shadow-lg border border-cream-dark p-6 max-w-xs mx-auto">
       <div className="space-y-3 font-serif">

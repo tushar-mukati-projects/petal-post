@@ -2,7 +2,6 @@
 
 import { useGetReactions } from "@/hooks/queries/useGetReactions";
 import { useAddReaction } from "@/hooks/queries/useAddReaction";
-import { useSessionId } from "@/hooks/useSessionId";
 import type { EmojiType } from "@/types/reaction";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -15,25 +14,22 @@ const EMOJIS: { type: EmojiType; icon: string }[] = [
 ];
 
 interface ReactionBarProps {
-  bouquetId: string;
+  floralId: string;
   compact?: boolean;
 }
 
-export function ReactionBar({ bouquetId, compact = false }: ReactionBarProps) {
-  const sessionId = useSessionId();
-  const { data: reactions } = useGetReactions(bouquetId, sessionId);
+export function ReactionBar({ floralId, compact = false }: ReactionBarProps) {
+  const { data: reactions } = useGetReactions(floralId);
   const { mutate: addReaction } = useAddReaction();
 
   const handleReact = (emoji: EmojiType) => {
-    if (!sessionId) return;
-    addReaction({ bouquetId, emoji, sessionId });
+    addReaction({ floralId, emoji });
   };
 
   return (
     <div className={cn("flex items-center", compact ? "gap-1" : "gap-2")}>
       {EMOJIS.map(({ type, icon }) => {
         const count = reactions?.[type] || 0;
-        const isActive = reactions?.userReactions?.includes(type);
 
         return (
           <motion.button
@@ -43,9 +39,7 @@ export function ReactionBar({ bouquetId, compact = false }: ReactionBarProps) {
             className={cn(
               "flex items-center gap-1 rounded-full transition-all cursor-pointer",
               compact ? "px-2 py-0.5 text-xs" : "px-3 py-1.5 text-sm",
-              isActive
-                ? "bg-petal-light/50 border border-petal/30"
-                : "bg-white/60 border border-transparent hover:bg-white hover:border-cream-dark",
+              "bg-white/60 border border-transparent hover:bg-white hover:border-cream-dark",
             )}
           >
             <span className={compact ? "text-sm" : "text-base"}>{icon}</span>

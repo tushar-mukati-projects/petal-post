@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { OCCASIONS } from "@/lib/occasions";
 import { motion } from "framer-motion";
-import { Flower2, Palette, Eye, ChevronDown } from "lucide-react";
+import { Flower2, Eye, ChevronDown } from "lucide-react";
 import { FloatingHearts } from "@/components/shared/FloatingHearts";
 
 export function HeroSection() {
@@ -52,7 +52,7 @@ export function HeroSection() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="text-lg sm:text-xl text-muted-foreground mt-4 max-w-md mx-auto font-light leading-relaxed"
         >
-          Craft beautiful digital flowers for the people who make your heart bloom
+          Craft beautiful Florals for the people who make your heart bloom
         </motion.p>
       </motion.div>
 
@@ -63,23 +63,13 @@ export function HeroSection() {
         transition={{ delay: 0.6, duration: 0.5 }}
         className="flex flex-col sm:flex-row items-center gap-4 mb-12"
       >
-        <Link href="/create?mode=color">
+        <Link href="/create">
           <Button
             size="lg"
             className="rounded-full gap-2 bg-petal hover:bg-petal/90 text-white px-10 py-6 text-lg font-heading font-bold shadow-lg shadow-petal/25 hover:shadow-xl hover:shadow-petal/30 transition-shadow"
           >
             <Flower2 className="w-5 h-5" />
-            Create Flowers
-          </Button>
-        </Link>
-        <Link href="/create?mode=mono">
-          <Button
-            size="lg"
-            variant="outline"
-            className="rounded-full gap-2 border-foreground/20 px-10 py-6 text-lg font-heading font-bold hover:bg-foreground/5 transition-colors"
-          >
-            <Palette className="w-5 h-5" />
-            Black & White
+            Create a Floral
           </Button>
         </Link>
         <Link href="/collections">
@@ -131,7 +121,7 @@ export function HeroSection() {
               transition={{ delay: 1.1 + i * 0.1 }}
             >
               <Link
-                href={`/create?mode=color&occasion=${occ.id}`}
+                href={`/create?occasion=${occ.id}`}
                 className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r ${occ.gradient} text-sm font-medium text-foreground shadow-sm hover:shadow-md hover:scale-105 transition-all`}
               >
                 <span>{occ.icon}</span>

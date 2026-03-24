@@ -1,18 +1,19 @@
 "use client";
 
 import { FLOWERS } from "@/flowers/data";
-import { useBouquetStore } from "@/stores/useBouquetStore";
+import { useFloralStore } from "@/stores/useFloralStore";
 import { OCCASION_MAP } from "@/lib/occasions";
 import { FlowerCard } from "./FlowerCard";
 import type { FlowerType } from "@/types/flower";
 import { motion } from "framer-motion";
 import { X } from "lucide-react";
+import { MAX_FLOWERS, MIN_FLOWERS } from "@/lib/constants";
 
 export function StepPickBlooms() {
-  const { mode, occasion, selectedFlowers, addFlower, removeFlower } = useBouquetStore();
+  const { occasion, selectedFlowers, addFlower, removeFlower } = useFloralStore();
 
   const flowerCount = selectedFlowers.length;
-  const isMaxed = flowerCount >= 10;
+  const isMaxed = flowerCount >= MAX_FLOWERS;
 
   // Count occurrences of each flower
   const flowerCounts: Record<string, number> = {};
@@ -38,17 +39,21 @@ export function StepPickBlooms() {
       <div className="text-center space-y-2">
         <h2 className="text-2xl font-heading font-extrabold text-foreground">Pick your blooms</h2>
         <p className="text-muted-foreground">
-          Select <span className="font-semibold text-petal">6 to 10</span> flowers for your creation
+          Select{" "}
+          <span className="font-semibold text-petal">
+            {MIN_FLOWERS} to {MAX_FLOWERS}
+          </span>{" "}
+          flowers for your Floral
         </p>
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-white rounded-full shadow-sm border border-cream-dark">
           <span
             className={`text-sm font-bold ${
-              flowerCount >= 6 ? "text-petal" : "text-muted-foreground"
+              flowerCount >= MIN_FLOWERS ? "text-petal" : "text-muted-foreground"
             }`}
           >
             {flowerCount}
           </span>
-          <span className="text-xs text-muted-foreground">/ 10 selected</span>
+          <span className="text-xs text-muted-foreground">/ {MAX_FLOWERS} selected</span>
         </div>
       </div>
 
@@ -66,7 +71,6 @@ export function StepPickBlooms() {
           <FlowerCard
             key={flower.id}
             flowerId={flower.id}
-            mode={mode}
             count={flowerCounts[flower.id] || 0}
             onSelect={() => addFlower(flower.id)}
             disabled={isMaxed && !flowerCounts[flower.id]}

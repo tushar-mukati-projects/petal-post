@@ -1,22 +1,41 @@
 "use client";
 
-import { use } from "react";
+import { use, useRef, useCallback } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { BouquetRenderer } from "@/components/bouquet/BouquetRenderer";
-import { ShareButtons } from "@/components/bouquet/ShareButtons";
-import { ReactionBar } from "@/components/garden/ReactionBar";
-import { useGetBouquet } from "@/hooks/queries/useGetBouquet";
+import { FloralRenderer } from "@/components/floral/FloralRenderer";
+import { ShareButtons } from "@/components/floral/ShareButtons";
+import { ReactionBar } from "@/components/collections/ReactionBar";
+import { useGetFloral } from "@/hooks/queries/useGetFloral";
 import type { ArrangementData } from "@/types/arrangement";
-import type { FlowerMode } from "@/types/flower";
-import type { WrapperType } from "@/types/bouquet";
+import type { WrapperType } from "@/types/floral";
 import { Loader2, Flower2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { FloatingHearts } from "@/components/shared/FloatingHearts";
+import { toPng } from "html-to-image";
+import { toast } from "sonner";
 
 export default function CreationPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { data: creation, isLoading, isError } = useGetBouquet(id);
+  const { data: creation, isLoading, isError } = useGetFloral(id);
+  const captureRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = useCallback(async () => {
+    if (!captureRef.current) return;
+    try {
+      const dataUrl = await toPng(captureRef.current, {
+        backgroundColor: "#faf5f0",
+        pixelRatio: 2,
+      });
+      const link = document.createElement("a");
+      link.download = "petalpost-floral.png";
+      link.href = dataUrl;
+      link.click();
+      toast.success("Downloaded!");
+    } catch {
+      toast.error("Failed to download. Try again.");
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -35,7 +54,7 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
             <Flower2 className="w-16 h-16 text-muted-foreground mx-auto" />
             <h1 className="text-2xl font-heading font-bold">Not found</h1>
             <p className="text-muted-foreground">
-              This creation may have been removed or the link is incorrect.
+              This Floral may have been removed or the link is incorrect.
             </p>
           </div>
         </main>
@@ -51,7 +70,6 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
       <Header />
 
       <main className="flex-1 flex flex-col items-center px-4 py-6">
-        {/* Central stage */}
         <div className="w-full max-w-md mx-auto">
           {/* Title */}
           <motion.p
@@ -60,7 +78,7 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
             transition={{ duration: 0.5 }}
             className="text-center text-sm font-medium text-petal tracking-wide uppercase mb-1"
           >
-            A gift for you
+            A Floral for you
           </motion.p>
           <motion.h1
             initial={{ opacity: 0, y: -8 }}
@@ -68,70 +86,66 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
             transition={{ duration: 0.5, delay: 0.1 }}
             className="text-center text-2xl sm:text-3xl font-heading font-extrabold text-foreground mb-2"
           >
-            Someone made this for you!
+            Someone sent you a Floral!
           </motion.h1>
 
-          {/* Bouquet showcase */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-            className="relative flex justify-center"
-          >
-            {/* Soft glow behind bouquet */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-radial from-petal-light/40 via-rose-pastel/20 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-            {/* Bouquet - clip top dead space */}
-            <div className="relative overflow-hidden" style={{ height: 370, marginTop: -20 }}>
-              <div style={{ marginTop: -50 }}>
-                <BouquetRenderer
-                  arrangement={creation.arrangement as ArrangementData}
-                  mode={creation.mode as FlowerMode}
-                  wrapper={creation.wrapper as WrapperType}
-                  animate
-                />
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Card - overlaps slightly into bouquet area */}
-          {hasCard && (
+          {/* Capturable area (floral + card) */}
+          <div ref={captureRef} className="pb-4">
+            {/* Floral showcase */}
             <motion.div
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{
-                delay: 0.7,
-                duration: 0.6,
-                type: "spring",
-                stiffness: 120,
-              }}
-              className="-mt-4 relative z-10"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+              className="relative flex justify-center"
             >
-              <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 mx-auto max-w-sm">
-                <div className="space-y-3 font-serif">
-                  {creation.cardTo && (
-                    <p className="text-foreground">
-                      <span className="font-semibold">Dear</span>{" "}
-                      <span className="text-petal">{creation.cardTo}</span>,
-                    </p>
-                  )}
-                  {creation.cardMessage && (
-                    <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
-                      {creation.cardMessage}
-                    </p>
-                  )}
-                  {creation.cardFrom && (
-                    <div className="text-right pt-2">
-                      <p className="text-foreground text-sm">
-                        <span className="font-semibold">Sincerely,</span>
-                      </p>
-                      <p className="text-petal text-sm">{creation.cardFrom}</p>
-                    </div>
-                  )}
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-80 h-80 rounded-full bg-rose-pastel/30 pointer-events-none" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-72 h-72 rounded-full bg-petal-light/25 blur-xl pointer-events-none" />
+
+              <div className="relative overflow-hidden" style={{ height: 370, marginTop: -20 }}>
+                <div style={{ marginTop: -50 }}>
+                  <FloralRenderer
+                    arrangement={creation.arrangement as ArrangementData}
+                    wrapper={creation.wrapper as WrapperType}
+                    animate
+                  />
                 </div>
               </div>
             </motion.div>
-          )}
+
+            {/* Card */}
+            {hasCard && (
+              <motion.div
+                initial={{ y: 30, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.6, type: "spring", stiffness: 120 }}
+                className="-mt-6 relative z-10 flex justify-center"
+              >
+                <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg]">
+                  <div className="space-y-3 font-serif">
+                    {creation.cardTo && (
+                      <p className="text-foreground">
+                        <span className="font-semibold">Dear</span>{" "}
+                        <span className="text-petal">{creation.cardTo}</span>,
+                      </p>
+                    )}
+                    {creation.cardMessage && (
+                      <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-wrap">
+                        {creation.cardMessage}
+                      </p>
+                    )}
+                    {creation.cardFrom && (
+                      <div className="text-right pt-2">
+                        <p className="text-foreground text-sm">
+                          <span className="font-semibold">Sincerely,</span>
+                        </p>
+                        <p className="text-petal text-sm">{creation.cardFrom}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </div>
 
           {/* Divider */}
           <motion.div
@@ -152,8 +166,8 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
             transition={{ delay: 1.1, duration: 0.4 }}
             className="flex flex-col items-center gap-4"
           >
-            <ShareButtons creationId={id} />
-            <ReactionBar bouquetId={id} />
+            <ShareButtons creationId={id} onDownload={handleDownload} />
+            <ReactionBar floralId={id} />
           </motion.div>
         </div>
       </main>

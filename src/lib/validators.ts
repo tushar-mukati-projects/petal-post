@@ -15,40 +15,69 @@ const flowerTypes = [
   "zinnia",
 ] as const;
 
-const flowerPositionSchema = z.object({
-  flowerId: z.string(),
-  index: z.number(),
-  x: z.number(),
-  y: z.number(),
-  rotation: z.number(),
-  scale: z.number(),
-  zIndex: z.number(),
-});
-
 const arrangementSchema = z.object({
-  positions: z.array(flowerPositionSchema),
-  seed: z.number(),
+  type: z.enum([
+    "dome",
+    "cascade",
+    "crescent",
+    "tower",
+    "fan",
+    "wild",
+    "spiral",
+    "triangle",
+    "diamond",
+    "cluster",
+    "wave",
+    "scatter",
+  ]),
+  flowers: z.array(z.string()),
 });
 
-export const createBouquetSchema = z.object({
-  mode: z.enum(["color", "mono"]),
+export const createFloralSchema = z.object({
   occasion: z.enum(["none", "birthday", "valentine", "thankyou", "getwell", "congrats"]),
-  flowers: z.array(z.enum(flowerTypes)).min(6).max(10),
+  flowers: z.array(z.enum(flowerTypes)).min(6).max(15),
   arrangement: arrangementSchema,
-  wrapper: z.enum(["paper", "vase", "basket", "ribbon"]),
+  wrapper: z.enum([
+    "paper",
+    "vase",
+    "basket",
+    "ribbon",
+    "foliage",
+    "tissue",
+    "jar",
+    "pot",
+    "giftbox",
+    "bucket",
+    "teacup",
+    "envelope",
+    "boot",
+    "sunhat",
+    "paperbag",
+    "crate",
+    "cone",
+    "mug",
+    "lantern",
+    "nest",
+    "shell",
+    "heartbox",
+    "cloud",
+    "wagon",
+    "bicycle",
+    "macrame",
+    "kimono",
+    "terrarium",
+    "origami",
+    "vintage",
+  ]),
   cardTo: z.string().max(50),
   cardMessage: z.string().max(500),
   cardFrom: z.string().max(50),
-  showInGarden: z.boolean().optional().default(true),
 });
-
-export const bouquetIdSchema = z.string().uuid();
 
 export const addReactionSchema = z.object({
-  bouquetId: z.string().uuid(),
+  floralId: z.string().uuid(),
   emoji: z.enum(["heart", "fire", "sparkle", "wow"]),
-  sessionId: z.string().min(1),
 });
 
-export type CreateBouquetInput = z.infer<typeof createBouquetSchema>;
+export type CreateFloralInput = z.infer<typeof createFloralSchema>;
 export type AddReactionInput = z.infer<typeof addReactionSchema>;

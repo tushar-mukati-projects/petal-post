@@ -1,6 +1,6 @@
-import type { FlowerType, FlowerMode } from "@/types/flower";
+import type { FlowerType } from "@/types/flower";
 import type { FlowerPalette } from "./types";
-import { COLOR_PALETTES, MONO_PALETTES } from "./palettes";
+import { COLOR_PALETTES } from "./palettes";
 
 // Import all bases
 import { RoseBase } from "./bases/RoseBase";
@@ -34,23 +34,21 @@ const FLOWER_COMPONENTS: Record<
   zinnia: ZinniaBase,
 };
 
-export function getFlowerComponent(id: FlowerType, mode: FlowerMode) {
+export function getFlowerComponent(id: FlowerType) {
   const Component = FLOWER_COMPONENTS[id];
-  const palette = mode === "color" ? COLOR_PALETTES[id] : MONO_PALETTES[id];
+  const palette = COLOR_PALETTES[id];
   return { Component, palette };
 }
 
 export function FlowerIcon({
   id,
-  mode,
   size,
   className,
 }: {
   id: FlowerType;
-  mode: FlowerMode;
   size?: number;
   className?: string;
 }) {
-  const { Component, palette } = getFlowerComponent(id, mode);
+  const { Component, palette } = getFlowerComponent(id);
   return <Component palette={palette} size={size} className={className} />;
 }

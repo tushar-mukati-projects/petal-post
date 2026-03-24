@@ -1,165 +1,248 @@
-import type { FlowerType, FlowerSize } from "@/types/flower";
-import type { ArrangementData, FlowerPosition } from "@/types/arrangement";
-import { FLOWER_MAP } from "@/flowers/data";
+import type { ArrangementType, FlowerPosition, TemplateArrangement } from "@/types/arrangement";
 
-// Mulberry32 seeded PRNG - deterministic random from a seed
-function mulberry32(seed: number): () => number {
-  return function () {
-    seed |= 0;
-    seed = (seed + 0x6d2b79f5) | 0;
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
+/**
+ * Each layout slot defines where a flower sits in the 380x440 container.
+ * Flowers are rendered at size ~110px, so positions are center-points.
+ * Slots are ordered back-to-front (first slot = lowest z-index).
+ */
+interface LayoutSlot {
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
 }
 
-/** Return a seeded random in [lo, hi). */
-function rngRange(rng: () => number, lo: number, hi: number): number {
-  return lo + rng() * (hi - lo);
-}
+// ===== LAYOUT TEMPLATES =====
+// Each has 10 slots (max flowers). For fewer flowers, we use from the start.
 
-const SIZE_CONFIG: Record<
-  FlowerSize,
-  {
-    sortPriority: number; // lower = placed first (back of bouquet)
-    baseScale: number;
-    scaleJitter: number;
-    /** How far from dome center this size prefers to sit (0 = dead center). */
-    radialBias: number;
-  }
-> = {
-  large: {
-    sortPriority: 0,
-    baseScale: 1.15,
-    scaleJitter: 0.06,
-    radialBias: 0.0,
-  },
-  medium: {
-    sortPriority: 1,
-    baseScale: 1.0,
-    scaleJitter: 0.07,
-    radialBias: 0.35,
-  },
-  small: {
-    sortPriority: 2,
-    baseScale: 0.88,
-    scaleJitter: 0.08,
-    radialBias: 0.7,
-  },
+// Y offset to push flowers down closer to wrappers
+const Y_SHIFT = 40;
+
+const LAYOUTS: Record<ArrangementType, LayoutSlot[]> = {
+  dome: [
+    { x: 190, y: 130 + Y_SHIFT, rotation: 0, scale: 1.15 },
+    { x: 145, y: 140 + Y_SHIFT, rotation: -8, scale: 1.1 },
+    { x: 235, y: 140 + Y_SHIFT, rotation: 7, scale: 1.1 },
+    { x: 168, y: 175 + Y_SHIFT, rotation: -4, scale: 1.05 },
+    { x: 215, y: 170 + Y_SHIFT, rotation: 5, scale: 1.08 },
+    { x: 130, y: 180 + Y_SHIFT, rotation: -12, scale: 0.95 },
+    { x: 250, y: 185 + Y_SHIFT, rotation: 10, scale: 0.95 },
+    { x: 190, y: 210 + Y_SHIFT, rotation: 2, scale: 1.0 },
+    { x: 155, y: 215 + Y_SHIFT, rotation: -6, scale: 0.92 },
+    { x: 225, y: 218 + Y_SHIFT, rotation: 8, scale: 0.9 },
+  ],
+
+  cascade: [
+    { x: 165, y: 120 + Y_SHIFT, rotation: -10, scale: 1.1 },
+    { x: 210, y: 125 + Y_SHIFT, rotation: 5, scale: 1.15 },
+    { x: 185, y: 160 + Y_SHIFT, rotation: -3, scale: 1.08 },
+    { x: 230, y: 155 + Y_SHIFT, rotation: 8, scale: 1.0 },
+    { x: 145, y: 165 + Y_SHIFT, rotation: -12, scale: 0.95 },
+    { x: 205, y: 195 + Y_SHIFT, rotation: 3, scale: 1.05 },
+    { x: 250, y: 185 + Y_SHIFT, rotation: 12, scale: 0.9 },
+    { x: 165, y: 205 + Y_SHIFT, rotation: -8, scale: 0.95 },
+    { x: 225, y: 220 + Y_SHIFT, rotation: 6, scale: 0.88 },
+    { x: 135, y: 210 + Y_SHIFT, rotation: -15, scale: 0.85 },
+  ],
+
+  crescent: [
+    { x: 140, y: 130 + Y_SHIFT, rotation: -15, scale: 0.95 },
+    { x: 155, y: 160 + Y_SHIFT, rotation: -10, scale: 1.1 },
+    { x: 175, y: 190 + Y_SHIFT, rotation: -5, scale: 1.15 },
+    { x: 200, y: 210 + Y_SHIFT, rotation: 0, scale: 1.1 },
+    { x: 230, y: 195 + Y_SHIFT, rotation: 5, scale: 1.08 },
+    { x: 250, y: 165 + Y_SHIFT, rotation: 10, scale: 1.0 },
+    { x: 260, y: 135 + Y_SHIFT, rotation: 14, scale: 0.92 },
+    { x: 190, y: 155 + Y_SHIFT, rotation: -2, scale: 1.0 },
+    { x: 215, y: 150 + Y_SHIFT, rotation: 3, scale: 0.95 },
+    { x: 165, y: 140 + Y_SHIFT, rotation: -8, scale: 0.9 },
+  ],
+
+  tower: [
+    { x: 190, y: 110 + Y_SHIFT, rotation: 0, scale: 1.15 },
+    { x: 180, y: 145 + Y_SHIFT, rotation: -5, scale: 1.1 },
+    { x: 200, y: 140 + Y_SHIFT, rotation: 4, scale: 1.05 },
+    { x: 175, y: 175 + Y_SHIFT, rotation: -8, scale: 1.08 },
+    { x: 205, y: 172 + Y_SHIFT, rotation: 6, scale: 1.0 },
+    { x: 190, y: 200 + Y_SHIFT, rotation: 2, scale: 1.05 },
+    { x: 165, y: 205 + Y_SHIFT, rotation: -10, scale: 0.95 },
+    { x: 215, y: 200 + Y_SHIFT, rotation: 8, scale: 0.95 },
+    { x: 185, y: 230 + Y_SHIFT, rotation: -3, scale: 0.9 },
+    { x: 200, y: 228 + Y_SHIFT, rotation: 5, scale: 0.88 },
+  ],
+
+  fan: [
+    { x: 190, y: 140 + Y_SHIFT, rotation: 0, scale: 1.2 },
+    { x: 135, y: 155 + Y_SHIFT, rotation: -18, scale: 1.05 },
+    { x: 245, y: 155 + Y_SHIFT, rotation: 18, scale: 1.05 },
+    { x: 110, y: 180 + Y_SHIFT, rotation: -25, scale: 0.95 },
+    { x: 270, y: 180 + Y_SHIFT, rotation: 25, scale: 0.95 },
+    { x: 160, y: 175 + Y_SHIFT, rotation: -10, scale: 1.0 },
+    { x: 220, y: 175 + Y_SHIFT, rotation: 10, scale: 1.0 },
+    { x: 190, y: 195 + Y_SHIFT, rotation: 2, scale: 1.08 },
+    { x: 145, y: 205 + Y_SHIFT, rotation: -15, scale: 0.9 },
+    { x: 235, y: 205 + Y_SHIFT, rotation: 14, scale: 0.9 },
+  ],
+
+  wild: [
+    { x: 200, y: 155 + Y_SHIFT, rotation: 5, scale: 1.18 },
+    { x: 155, y: 130 + Y_SHIFT, rotation: -20, scale: 1.0 },
+    { x: 240, y: 140 + Y_SHIFT, rotation: 15, scale: 1.05 },
+    { x: 130, y: 170 + Y_SHIFT, rotation: -25, scale: 0.92 },
+    { x: 260, y: 175 + Y_SHIFT, rotation: 22, scale: 0.95 },
+    { x: 180, y: 190 + Y_SHIFT, rotation: -8, scale: 1.1 },
+    { x: 225, y: 200 + Y_SHIFT, rotation: 12, scale: 1.0 },
+    { x: 165, y: 220 + Y_SHIFT, rotation: -15, scale: 0.88 },
+    { x: 210, y: 225 + Y_SHIFT, rotation: 8, scale: 0.92 },
+    { x: 250, y: 210 + Y_SHIFT, rotation: 20, scale: 0.85 },
+  ],
+
+  spiral: [
+    { x: 200, y: 150 + Y_SHIFT, rotation: 0, scale: 1.2 },
+    { x: 235, y: 140 + Y_SHIFT, rotation: 15, scale: 1.1 },
+    { x: 245, y: 175 + Y_SHIFT, rotation: 25, scale: 1.0 },
+    { x: 215, y: 200 + Y_SHIFT, rotation: 10, scale: 1.05 },
+    { x: 175, y: 205 + Y_SHIFT, rotation: -5, scale: 0.95 },
+    { x: 155, y: 175 + Y_SHIFT, rotation: -18, scale: 1.0 },
+    { x: 160, y: 140 + Y_SHIFT, rotation: -12, scale: 0.95 },
+    { x: 190, y: 125 + Y_SHIFT, rotation: 3, scale: 0.9 },
+    { x: 220, y: 160 + Y_SHIFT, rotation: 8, scale: 0.88 },
+    { x: 195, y: 180 + Y_SHIFT, rotation: -2, scale: 0.92 },
+  ],
+
+  triangle: [
+    { x: 190, y: 120 + Y_SHIFT, rotation: 0, scale: 1.2 },
+    { x: 160, y: 155 + Y_SHIFT, rotation: -8, scale: 1.1 },
+    { x: 225, y: 155 + Y_SHIFT, rotation: 8, scale: 1.1 },
+    { x: 130, y: 195 + Y_SHIFT, rotation: -15, scale: 1.0 },
+    { x: 190, y: 185 + Y_SHIFT, rotation: 2, scale: 1.05 },
+    { x: 255, y: 195 + Y_SHIFT, rotation: 14, scale: 1.0 },
+    { x: 110, y: 220 + Y_SHIFT, rotation: -20, scale: 0.9 },
+    { x: 160, y: 215 + Y_SHIFT, rotation: -6, scale: 0.92 },
+    { x: 225, y: 215 + Y_SHIFT, rotation: 6, scale: 0.92 },
+    { x: 275, y: 220 + Y_SHIFT, rotation: 18, scale: 0.88 },
+  ],
+
+  diamond: [
+    { x: 190, y: 120 + Y_SHIFT, rotation: 0, scale: 1.1 },
+    { x: 155, y: 155 + Y_SHIFT, rotation: -10, scale: 1.05 },
+    { x: 230, y: 155 + Y_SHIFT, rotation: 10, scale: 1.05 },
+    { x: 190, y: 175 + Y_SHIFT, rotation: 2, scale: 1.2 },
+    { x: 130, y: 180 + Y_SHIFT, rotation: -18, scale: 0.92 },
+    { x: 255, y: 180 + Y_SHIFT, rotation: 16, scale: 0.92 },
+    { x: 160, y: 210 + Y_SHIFT, rotation: -8, scale: 1.0 },
+    { x: 225, y: 210 + Y_SHIFT, rotation: 8, scale: 1.0 },
+    { x: 190, y: 230 + Y_SHIFT, rotation: 0, scale: 0.95 },
+    { x: 190, y: 145 + Y_SHIFT, rotation: 3, scale: 0.9 },
+  ],
+
+  cluster: [
+    { x: 185, y: 155 + Y_SHIFT, rotation: -3, scale: 1.2 },
+    { x: 210, y: 150 + Y_SHIFT, rotation: 5, scale: 1.15 },
+    { x: 195, y: 175 + Y_SHIFT, rotation: 0, scale: 1.1 },
+    { x: 170, y: 165 + Y_SHIFT, rotation: -8, scale: 1.05 },
+    { x: 220, y: 170 + Y_SHIFT, rotation: 7, scale: 1.05 },
+    { x: 185, y: 195 + Y_SHIFT, rotation: -4, scale: 1.0 },
+    { x: 210, y: 190 + Y_SHIFT, rotation: 4, scale: 1.0 },
+    { x: 165, y: 190 + Y_SHIFT, rotation: -10, scale: 0.92 },
+    { x: 230, y: 185 + Y_SHIFT, rotation: 10, scale: 0.9 },
+    { x: 200, y: 140 + Y_SHIFT, rotation: 2, scale: 0.95 },
+  ],
+
+  wave: [
+    { x: 120, y: 160 + Y_SHIFT, rotation: -15, scale: 1.0 },
+    { x: 150, y: 145 + Y_SHIFT, rotation: -8, scale: 1.1 },
+    { x: 180, y: 155 + Y_SHIFT, rotation: -2, scale: 1.15 },
+    { x: 210, y: 140 + Y_SHIFT, rotation: 3, scale: 1.1 },
+    { x: 240, y: 155 + Y_SHIFT, rotation: 8, scale: 1.05 },
+    { x: 270, y: 145 + Y_SHIFT, rotation: 14, scale: 0.95 },
+    { x: 135, y: 190 + Y_SHIFT, rotation: -12, scale: 0.92 },
+    { x: 195, y: 185 + Y_SHIFT, rotation: 0, scale: 1.0 },
+    { x: 255, y: 180 + Y_SHIFT, rotation: 10, scale: 0.9 },
+    { x: 165, y: 180 + Y_SHIFT, rotation: -5, scale: 0.95 },
+  ],
+
+  scatter: [
+    { x: 145, y: 135 + Y_SHIFT, rotation: -22, scale: 1.05 },
+    { x: 240, y: 130 + Y_SHIFT, rotation: 18, scale: 1.1 },
+    { x: 185, y: 160 + Y_SHIFT, rotation: 8, scale: 1.18 },
+    { x: 260, y: 175 + Y_SHIFT, rotation: -12, scale: 0.95 },
+    { x: 125, y: 180 + Y_SHIFT, rotation: 25, scale: 0.9 },
+    { x: 215, y: 195 + Y_SHIFT, rotation: -5, scale: 1.0 },
+    { x: 160, y: 210 + Y_SHIFT, rotation: 15, scale: 0.92 },
+    { x: 280, y: 155 + Y_SHIFT, rotation: -20, scale: 0.85 },
+    { x: 200, y: 130 + Y_SHIFT, rotation: 3, scale: 0.95 },
+    { x: 240, y: 210 + Y_SHIFT, rotation: 12, scale: 0.88 },
+  ],
 };
 
-export function generateArrangement(
-  flowers: FlowerType[],
-  seed: number,
-  container = { w: 380, h: 440 },
-): ArrangementData {
-  const rng = mulberry32(seed);
-  const total = flowers.length;
+const ARRANGEMENT_TYPES: ArrangementType[] = [
+  "dome",
+  "cascade",
+  "crescent",
+  "tower",
+  "fan",
+  "wild",
+  "spiral",
+  "triangle",
+  "diamond",
+  "cluster",
+  "wave",
+  "scatter",
+];
 
-  if (total === 0) return { positions: [], seed };
+export function getArrangementTypes(): ArrangementType[] {
+  return ARRANGEMENT_TYPES;
+}
 
-  // ---- Dome region ----
-  // Flowers cluster in the upper-center area of the container,
-  // above the wrapper which occupies roughly y: 242-440.
-  const domeCenter = {
-    x: container.w / 2, // 190
-    y: 195, // shifted down so flowers sit snugly above/in the wrapper
-  };
-  // Radii for the elliptical dome – tighter so flowers overlap nicely
-  const domeRadiusX = 75; // horizontal spread
-  const domeRadiusY = 65; // vertical spread
+/**
+ * Resolve a template arrangement into concrete flower positions.
+ */
+export function resolvePositions(arrangement: TemplateArrangement): FlowerPosition[] {
+  const layout = LAYOUTS[arrangement.type] || LAYOUTS.dome;
+  const flowers = arrangement.flowers;
 
-  // ---- Sort flowers into placement layers ----
-  // Large flowers first (back / center), then medium, then small (front / edges).
-  const indexed = flowers.map((f, i) => ({
-    flower: f,
-    originalIndex: i,
-    size: (FLOWER_MAP[f]?.size || "medium") as FlowerSize,
-  }));
-
-  // Stable sort by size priority, with slight shuffle within each tier
-  // so same-size flowers don't always land in the same spot.
-  const tierShuffleKeys = indexed.map(() => rng());
-  indexed.sort((a, b) => {
-    const pa = SIZE_CONFIG[a.size].sortPriority;
-    const pb = SIZE_CONFIG[b.size].sortPriority;
-    if (pa !== pb) return pa - pb;
-    return tierShuffleKeys[a.originalIndex] - tierShuffleKeys[b.originalIndex];
-  });
-
-  // ---- Golden-angle spiral base positions ----
-  // The golden angle gives a naturally pleasing, non-overlapping-but-close
-  // distribution. We scale it down so flowers *do* overlap for that lush look.
-  const goldenAngle = Math.PI * (3 - Math.sqrt(5)); // ~137.5 degrees
-
-  const positions: FlowerPosition[] = indexed.map((item, i) => {
-    const cfg = SIZE_CONFIG[item.size];
-    const t = total > 1 ? i / (total - 1) : 0; // 0..1
-
-    // --- Spiral placement ---
-    // Spiral distance grows with sqrt(index) to fill a disc uniformly.
-    // radialBias pushes small flowers outward, keeps large flowers near center.
-    const baseFraction = Math.sqrt((i + 0.5) / total);
-    const biasedFraction = baseFraction * (0.4 + cfg.radialBias * 0.6);
-    // Add jitter so it doesn't look mechanical
-    const jitterR = rngRange(rng, -0.12, 0.12);
-    const fraction = Math.max(0, Math.min(1, biasedFraction + jitterR));
-
-    const spiralAngle = i * goldenAngle + rngRange(rng, -0.3, 0.3);
-
-    const rx = fraction * domeRadiusX;
-    const ry = fraction * domeRadiusY;
-
-    let x = domeCenter.x + Math.cos(spiralAngle) * rx;
-    let y = domeCenter.y + Math.sin(spiralAngle) * ry;
-
-    // --- Additional position jitter for natural feel ---
-    x += rngRange(rng, -8, 8);
-    y += rngRange(rng, -6, 6);
-
-    // --- Depth layering ---
-    // Back flowers (placed first, large) get lower zIndex and sit slightly
-    // higher (lower y). Front flowers get higher zIndex, sit slightly lower.
-    const layerOffset = t * 22; // front flowers shift down up to 22px
-    y += layerOffset;
-    // Push back-row flowers up a bit more
-    y -= (1 - t) * 10;
-
-    // Clamp into the valid dome region
-    x = Math.max(110, Math.min(270, x));
-    y = Math.max(100, Math.min(290, y));
-
-    // --- Rotation: slight natural tilt ---
-    // Flowers near edges tilt outward; center flowers stay more upright.
-    const distFromCenterX = (x - domeCenter.x) / domeRadiusX; // -1..1
-    const baseTilt = distFromCenterX * 10; // lean outward up to 10 deg
-    const tiltJitter = rngRange(rng, -5, 5);
-    const rotation = Math.max(-15, Math.min(15, baseTilt + tiltJitter));
-
-    // --- Scale ---
-    const scaleJitter = rngRange(rng, -cfg.scaleJitter, cfg.scaleJitter);
-    // Back flowers slightly smaller (further away), front slightly larger
-    const depthScale = 0.95 + t * 0.08;
-    const scale = cfg.baseScale * depthScale + scaleJitter;
-
-    // --- Z-index ---
-    // Simple: placement order = depth order. Later-placed (front) flowers
-    // have higher zIndex so they naturally overlap the ones behind them.
-    // Add a small random bump so adjacent flowers interleave slightly.
-    const zIndex = i + Math.round(rngRange(rng, 0, 2));
-
+  return flowers.map((flowerId, i) => {
+    const slot = layout[i % layout.length];
+    // For overflow flowers (beyond layout slots), offset slightly so they don't stack exactly
+    const overflow = Math.floor(i / layout.length);
+    const offsetX = overflow * 12 * (i % 2 === 0 ? 1 : -1);
+    const offsetY = overflow * 8;
     return {
-      flowerId: item.flower,
-      index: item.originalIndex,
-      x: Math.round(x * 10) / 10,
-      y: Math.round(y * 10) / 10,
-      rotation: Math.round(rotation * 10) / 10,
-      scale: Math.round(scale * 100) / 100,
-      zIndex,
+      flowerId,
+      index: i,
+      x: slot.x + offsetX,
+      y: slot.y + offsetY,
+      rotation: slot.rotation + overflow * 5,
+      scale: slot.scale * (1 - overflow * 0.05),
+      zIndex: i,
     };
   });
+}
 
-  return { positions, seed };
+/**
+ * Create a template arrangement.
+ */
+export function createArrangement(
+  flowers: string[],
+  type: ArrangementType = "dome",
+): TemplateArrangement {
+  return { type, flowers: [...flowers] };
+}
+
+/**
+ * Cycle to next arrangement type.
+ */
+export function nextArrangementType(current: ArrangementType): ArrangementType {
+  const idx = ARRANGEMENT_TYPES.indexOf(current);
+  return ARRANGEMENT_TYPES[(idx + 1) % ARRANGEMENT_TYPES.length];
+}
+
+// Legacy support
+export function generateArrangement(flowers: string[], seed: number): TemplateArrangement {
+  // Map old seed-based calls to template arrangements
+  const typeIdx = Math.abs(seed) % ARRANGEMENT_TYPES.length;
+  return { type: ARRANGEMENT_TYPES[typeIdx], flowers: [...flowers] };
 }
 
 export function newSeed(): number {

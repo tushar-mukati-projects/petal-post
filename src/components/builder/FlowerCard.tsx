@@ -2,20 +2,19 @@
 
 import { FlowerIcon } from "@/flowers";
 import { FLOWER_MAP } from "@/flowers/data";
-import type { FlowerType, FlowerMode } from "@/types/flower";
+import type { FlowerType } from "@/types/flower";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface FlowerCardProps {
   flowerId: FlowerType;
-  mode: FlowerMode;
   count: number;
   onSelect: () => void;
   disabled?: boolean;
 }
 
-export function FlowerCard({ flowerId, mode, count, onSelect, disabled }: FlowerCardProps) {
+export function FlowerCard({ flowerId, count, onSelect, disabled }: FlowerCardProps) {
   const flower = FLOWER_MAP[flowerId];
 
   return (
@@ -31,7 +30,7 @@ export function FlowerCard({ flowerId, mode, count, onSelect, disabled }: Flower
         )}
       >
         <div className="relative">
-          <FlowerIcon id={flowerId} mode={mode} size={80} />
+          <FlowerIcon id={flowerId} size={80} />
           {count > 0 && (
             <Badge className="absolute -top-1 -right-1 bg-petal text-white text-xs min-w-[20px] h-5 flex items-center justify-center rounded-full border-0">
               {count}

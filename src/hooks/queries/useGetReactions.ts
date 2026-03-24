@@ -4,16 +4,14 @@ import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
 import type { ReactionCounts } from "@/types/reaction";
 
-export function useGetReactions(bouquetId: string, sessionId: string) {
+export function useGetReactions(floralId: string) {
   return useQuery<ReactionCounts>({
-    queryKey: ["reactions", bouquetId, sessionId],
+    queryKey: ["reactions", floralId],
     queryFn: async () => {
-      const { data } = await api.get(
-        `/api/reactions?bouquetId=${bouquetId}&sessionId=${sessionId}`,
-      );
+      const { data } = await api.get(`/api/reactions?floralId=${floralId}`);
       return data;
     },
-    enabled: !!bouquetId,
+    enabled: !!floralId,
     staleTime: 10_000,
   });
 }

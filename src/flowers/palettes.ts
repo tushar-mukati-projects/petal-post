@@ -87,16 +87,3 @@ export const COLOR_PALETTES: Record<FlowerType, FlowerPalette> = {
     dark: "#c51162",
   },
 };
-
-export const MONO_PALETTES: Record<FlowerType, FlowerPalette> = Object.fromEntries(
-  Object.entries(COLOR_PALETTES).map(([key]) => [
-    key,
-    {
-      primary: "#9e9e9e",
-      secondary: "#757575",
-      accent: "#bdbdbd",
-      center: "#616161",
-      dark: "#424242",
-    },
-  ]),
-) as Record<FlowerType, FlowerPalette>;

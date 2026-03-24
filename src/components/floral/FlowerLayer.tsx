@@ -1,22 +1,21 @@
 "use client";
 
 import { FlowerIcon } from "@/flowers";
-import type { FlowerType, FlowerMode } from "@/types/flower";
+import type { FlowerType } from "@/types/flower";
 import type { FlowerPosition } from "@/types/arrangement";
 import { motion } from "framer-motion";
 
 interface FlowerLayerProps {
   position: FlowerPosition;
-  mode: FlowerMode;
   animate?: boolean;
   index?: number;
 }
 
-export function FlowerLayer({ position, mode, animate = false, index = 0 }: FlowerLayerProps) {
+export function FlowerLayer({ position, animate = false, index = 0 }: FlowerLayerProps) {
   const style: React.CSSProperties = {
     position: "absolute",
-    left: `${position.x - 45}px`,
-    top: `${position.y - 45}px`,
+    left: `${position.x - 60}px`,
+    top: `${position.y - 60}px`,
     transform: `rotate(${position.rotation}deg) scale(${position.scale})`,
     zIndex: position.zIndex,
     transformOrigin: "center center",
@@ -43,14 +42,14 @@ export function FlowerLayer({ position, mode, animate = false, index = 0 }: Flow
           },
         }}
       >
-        <FlowerIcon id={position.flowerId as FlowerType} mode={mode} size={90} />
+        <FlowerIcon id={position.flowerId as FlowerType} size={120} />
       </motion.div>
     );
   }
 
   return (
     <div style={style}>
-      <FlowerIcon id={position.flowerId as FlowerType} mode={mode} size={90} />
+      <FlowerIcon id={position.flowerId as FlowerType} size={120} />
     </div>
   );
 }

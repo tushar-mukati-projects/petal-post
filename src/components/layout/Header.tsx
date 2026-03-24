@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { FeedbackModal } from "./FeedbackModal";
 
 export function Header() {
   return (
@@ -12,7 +13,7 @@ export function Header() {
         </Link>
         <nav className="flex items-center gap-4">
           <Link
-            href="/create?mode=color"
+            href="/create"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Create
@@ -23,6 +24,7 @@ export function Header() {
           >
             Collections
           </Link>
+          <FeedbackModal />
         </nav>
       </div>
     </header>

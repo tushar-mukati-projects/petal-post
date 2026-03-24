@@ -12,8 +12,6 @@ export type FlowerType =
   | "ranunculus"
   | "zinnia";
 
-export type FlowerMode = "color" | "mono";
-
 export type FlowerSize = "large" | "medium" | "small";
 
 export interface FlowerDefinition {

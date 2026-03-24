@@ -19,11 +19,11 @@ const poppins = Poppins({
 
 export const metadata: Metadata = {
   title: {
-    default: "PetalPost - Craft beautiful digital flowers",
+    default: "PetalPost - Craft & send beautiful Florals",
     template: "%s | PetalPost",
   },
   description:
-    "Create beautiful digital flower arrangements and send them to the people you love. Pick your blooms, customize the style, write a heartfelt card, and share it with a unique link.",
+    "Create beautiful digital Florals and send them to the people you love. Pick your blooms, customize the style, write a heartfelt card, and share it with a unique link.",
   keywords: [
     "digital flowers",
     "flower arrangement",
@@ -33,15 +33,15 @@ export const metadata: Metadata = {
     "PetalPost",
   ],
   openGraph: {
-    title: "PetalPost - Craft beautiful digital flowers",
-    description: "Create beautiful digital flower arrangements and share them with a unique link.",
+    title: "PetalPost - Craft & send beautiful Florals",
+    description: "Create beautiful digital Florals and share them with a unique link.",
     siteName: "PetalPost",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "PetalPost - Craft beautiful digital flowers",
-    description: "Create beautiful digital flower arrangements and share them with a unique link.",
+    title: "PetalPost - Craft & send beautiful Florals",
+    description: "Create beautiful digital Florals and share them with a unique link.",
   },
 };
 

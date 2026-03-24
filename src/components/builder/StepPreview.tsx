@@ -1,32 +1,23 @@
 "use client";
 
-import { useBouquetStore } from "@/stores/useBouquetStore";
-import { BouquetRenderer } from "@/components/bouquet/BouquetRenderer";
-import { useCreateBouquet } from "@/hooks/queries/useCreateBouquet";
+import { useFloralStore } from "@/stores/useFloralStore";
+import { FloralRenderer } from "@/components/floral/FloralRenderer";
+import { useCreateFloral } from "@/hooks/queries/useCreateFloral";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2 } from "lucide-react";
 import { FloatingHearts } from "@/components/shared/FloatingHearts";
 import { motion } from "framer-motion";
 
 export function StepPreview() {
-  const {
-    mode,
-    occasion,
-    selectedFlowers,
-    arrangement,
-    wrapperTheme,
-    cardTo,
-    cardMessage,
-    cardFrom,
-  } = useBouquetStore();
+  const { occasion, selectedFlowers, arrangement, wrapperTheme, cardTo, cardMessage, cardFrom } =
+    useFloralStore();
 
-  const { mutate: createBouquet, isPending } = useCreateBouquet();
+  const { mutate: createFloral, isPending } = useCreateFloral();
 
   if (!arrangement) return null;
 
   const handleSend = () => {
-    createBouquet({
-      mode,
+    createFloral({
       occasion,
       flowers: selectedFlowers,
       arrangement,
@@ -34,7 +25,6 @@ export function StepPreview() {
       cardTo,
       cardMessage,
       cardFrom,
-      showInGarden: true,
     });
   };
 
@@ -48,26 +38,27 @@ export function StepPreview() {
         {/* Header */}
         <div className="text-center mb-2">
           <h2 className="text-2xl font-heading font-extrabold text-foreground">
-            Preview your creation
+            Preview your Floral
           </h2>
           <p className="text-muted-foreground text-sm">Here&apos;s what your recipient will see</p>
         </div>
 
-        {/* Bouquet showcase */}
+        {/* Floral showcase */}
         <div className="relative flex justify-center">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-radial from-petal-light/30 via-rose-pastel/15 to-transparent rounded-full blur-2xl pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-72 h-72 rounded-full bg-rose-pastel/30 pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-64 h-64 rounded-full bg-petal-light/25 blur-xl pointer-events-none" />
 
           <div className="relative overflow-hidden" style={{ height: 370, marginTop: -20 }}>
             <div style={{ marginTop: -50 }}>
-              <BouquetRenderer arrangement={arrangement} mode={mode} wrapper={wrapperTheme} />
+              <FloralRenderer arrangement={arrangement} wrapper={wrapperTheme} />
             </div>
           </div>
         </div>
 
         {/* Card preview */}
         {hasCard && (
-          <div className="-mt-4 relative z-10">
-            <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 mx-auto max-w-sm">
+          <div className="-mt-6 relative z-10 flex justify-center">
+            <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg]">
               <div className="space-y-3 font-serif">
                 {cardTo && (
                   <p className="text-foreground">
@@ -117,7 +108,7 @@ export function StepPreview() {
             ) : (
               <Send className="w-5 h-5" />
             )}
-            {isPending ? "Sending..." : "Send It"}
+            {isPending ? "Sending..." : "Send Floral"}
           </Button>
         </motion.div>
       </div>
