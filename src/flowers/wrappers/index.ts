@@ -1,34 +1,65 @@
 import type { WrapperType } from "@/types/floral";
-import { PaperWrap } from "./PaperWrap";
-import { GlassVase } from "./GlassVase";
-import { WovenBasket } from "./WovenBasket";
-import { RibbonTied } from "./RibbonTied";
-import { Foliage } from "./Foliage";
-import { TissueWrap } from "./TissueWrap";
-import { MasonJar } from "./MasonJar";
-import { TerraCottaPot } from "./TerraCottaPot";
-import { GiftBox } from "./GiftBox";
-import { MetalBucket } from "./MetalBucket";
-import { Teacup } from "./Teacup";
-import { LoveEnvelope } from "./LoveEnvelope";
-import { RainBoot } from "./RainBoot";
-import { SunHat } from "./SunHat";
-import { PaperBag } from "./PaperBag";
-import { WoodCrate } from "./WoodCrate";
-import { WaffleCone } from "./WaffleCone";
-import { CoffeeMug } from "./CoffeeMug";
-import { PaperLantern } from "./PaperLantern";
-import { BirdNest } from "./BirdNest";
-import { Seashell } from "./Seashell";
-import { HeartBox } from "./HeartBox";
-import { FluffyCloud } from "./FluffyCloud";
-import { LittleWagon } from "./LittleWagon";
-import { BicycleBasket } from "./BicycleBasket";
-import { Macrame } from "./Macrame";
-import { KimonoWrap } from "./Kimono";
-import { Terrarium } from "./Terrarium";
-import { OrigamiWrap } from "./Origami";
-import { VintageTin } from "./Vintage";
+// Freehand wrappers
+import { FreehandPaper } from "./FreehandPaper";
+import { FreehandVase } from "./FreehandVase";
+import { FreehandBasket } from "./FreehandBasket";
+import { FreehandTissue } from "./FreehandTissue";
+import { FreehandPot } from "./FreehandPot";
+import { FreehandJar } from "./FreehandJar";
+import { FreehandRibbon } from "./FreehandRibbon";
+import { FreehandEnvelope } from "./FreehandEnvelope";
+import { FreehandTeacup } from "./FreehandTeacup";
+import { FreehandBoot } from "./FreehandBoot";
+import { FreehandGiftbox } from "./FreehandGiftbox";
+import { FreehandCloud } from "./FreehandCloud";
+import { FreehandBucket } from "./FreehandBucket";
+import { FreehandMacrame } from "./FreehandMacrame";
+import { FreehandKimono } from "./FreehandKimono";
+import { FreehandTerrarium } from "./FreehandTerrarium";
+import { FreehandOrigami } from "./FreehandOrigami";
+import { FreehandVintage } from "./FreehandVintage";
+import { FreehandFoliage } from "./FreehandFoliage";
+import { FreehandSunhat } from "./FreehandSunhat";
+import { FreehandPaperbag } from "./FreehandPaperbag";
+import { FreehandCrate } from "./FreehandCrate";
+import { FreehandCone } from "./FreehandCone";
+import { FreehandMug } from "./FreehandMug";
+import { FreehandLantern } from "./FreehandLantern";
+import { FreehandNest } from "./FreehandNest";
+import { FreehandShell } from "./FreehandShell";
+import { FreehandHeartbox } from "./FreehandHeartbox";
+import { FreehandWagon } from "./FreehandWagon";
+import { FreehandBicycle } from "./FreehandBicycle";
+import { PaperWrap } from "./RoughPaperWrap";
+import { GlassVase } from "./RoughGlassVase";
+import { WovenBasket } from "./RoughWovenBasket";
+import { RibbonTied } from "./RoughRibbonTied";
+import { Foliage } from "./RoughFoliage";
+import { TissueWrap } from "./RoughTissueWrap";
+import { MasonJar } from "./RoughMasonJar";
+import { TerraCottaPot } from "./RoughTerraCottaPot";
+import { GiftBox } from "./RoughGiftBox";
+import { MetalBucket } from "./RoughMetalBucket";
+import { Teacup } from "./RoughTeacup";
+import { LoveEnvelope } from "./RoughLoveEnvelope";
+import { RainBoot } from "./RoughRainBoot";
+import { SunHat } from "./RoughSunHat";
+import { PaperBag } from "./RoughPaperBag";
+import { WoodCrate } from "./RoughWoodCrate";
+import { WaffleCone } from "./RoughWaffleCone";
+import { CoffeeMug } from "./RoughCoffeeMug";
+import { PaperLantern } from "./RoughPaperLantern";
+import { BirdNest } from "./RoughBirdNest";
+import { Seashell } from "./RoughSeashell";
+import { HeartBox } from "./RoughHeartBox";
+import { FluffyCloud } from "./RoughFluffyCloud";
+import { LittleWagon } from "./RoughLittleWagon";
+import { BicycleBasket } from "./RoughBicycleBasket";
+import { Macrame } from "./RoughMacrame";
+import { KimonoWrap } from "./RoughKimono";
+import { Terrarium } from "./RoughTerrarium";
+import { OrigamiWrap } from "./RoughOrigami";
+import { VintageTin } from "./RoughVintage";
 
 export const WRAPPER_COMPONENTS: Record<
   WrapperType,
@@ -64,6 +95,42 @@ export const WRAPPER_COMPONENTS: Record<
   terrarium: Terrarium,
   origami: OrigamiWrap,
   vintage: VintageTin,
+};
+
+// Freehand versions (partial — falls back to rough when not available)
+export const FREEHAND_WRAPPER_COMPONENTS: Partial<
+  Record<WrapperType, React.ComponentType<{ className?: string }>>
+> = {
+  paper: FreehandPaper,
+  vase: FreehandVase,
+  basket: FreehandBasket,
+  tissue: FreehandTissue,
+  pot: FreehandPot,
+  jar: FreehandJar,
+  ribbon: FreehandRibbon,
+  envelope: FreehandEnvelope,
+  teacup: FreehandTeacup,
+  boot: FreehandBoot,
+  giftbox: FreehandGiftbox,
+  cloud: FreehandCloud,
+  bucket: FreehandBucket,
+  macrame: FreehandMacrame,
+  kimono: FreehandKimono,
+  terrarium: FreehandTerrarium,
+  origami: FreehandOrigami,
+  vintage: FreehandVintage,
+  foliage: FreehandFoliage,
+  sunhat: FreehandSunhat,
+  paperbag: FreehandPaperbag,
+  crate: FreehandCrate,
+  cone: FreehandCone,
+  mug: FreehandMug,
+  lantern: FreehandLantern,
+  nest: FreehandNest,
+  shell: FreehandShell,
+  heartbox: FreehandHeartbox,
+  wagon: FreehandWagon,
+  bicycle: FreehandBicycle,
 };
 
 export const WRAPPER_LABELS: Record<WrapperType, string> = {

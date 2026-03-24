@@ -6,10 +6,11 @@ import { useCreateFloral } from "@/hooks/queries/useCreateFloral";
 import { Button } from "@/components/ui/button";
 import { Send, Loader2 } from "lucide-react";
 import { FloatingHearts } from "@/components/shared/FloatingHearts";
+import { OCCASION_MAP } from "@/lib/occasions";
 import { motion } from "framer-motion";
 
 export function StepPreview() {
-  const { occasion, selectedFlowers, arrangement, wrapperTheme, cardTo, cardMessage, cardFrom } =
+  const { occasion, selectedFlowers, arrangement, wrapper, cardTo, cardMessage, cardFrom } =
     useFloralStore();
 
   const { mutate: createFloral, isPending } = useCreateFloral();
@@ -21,7 +22,7 @@ export function StepPreview() {
       occasion,
       flowers: selectedFlowers,
       arrangement,
-      wrapper: wrapperTheme,
+      wrapper,
       cardTo,
       cardMessage,
       cardFrom,
@@ -44,13 +45,15 @@ export function StepPreview() {
         </div>
 
         {/* Floral showcase */}
-        <div className="relative flex justify-center">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-72 h-72 rounded-full bg-rose-pastel/30 pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-64 h-64 rounded-full bg-petal-light/25 blur-xl pointer-events-none" />
+        <div className="relative">
+          <div className="relative flex justify-center z-10">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-72 h-72 rounded-full bg-rose-pastel/30 pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-64 h-64 rounded-full bg-petal-light/25 blur-xl pointer-events-none" />
 
-          <div className="relative overflow-hidden" style={{ height: 370, marginTop: -20 }}>
-            <div style={{ marginTop: -50 }}>
-              <FloralRenderer arrangement={arrangement} wrapper={wrapperTheme} />
+            <div className="relative overflow-hidden" style={{ height: 370, marginTop: -20 }}>
+              <div style={{ marginTop: -50 }}>
+                <FloralRenderer arrangement={arrangement} wrapper={wrapper} />
+              </div>
             </div>
           </div>
         </div>
@@ -58,7 +61,12 @@ export function StepPreview() {
         {/* Card preview */}
         {hasCard && (
           <div className="-mt-6 relative z-10 flex justify-center">
-            <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg]">
+            <div className="relative bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg]">
+              {occasion && (
+                <span className="absolute -top-2 -right-2 font-handwritten text-xs font-semibold text-petal bg-petal-light/60 px-2.5 py-0.5 rounded-full rotate-[8deg] shadow-sm">
+                  {OCCASION_MAP[occasion]?.icon} {OCCASION_MAP[occasion]?.label}
+                </span>
+              )}
               <div className="space-y-3 font-serif">
                 {cardTo && (
                   <p className="text-foreground">

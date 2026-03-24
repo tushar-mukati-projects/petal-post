@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Nunito, Poppins } from "next/font/google";
+import { Nunito, Poppins, Caveat } from "next/font/google";
 import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryProvider } from "@/providers/QueryProvider";
@@ -15,6 +15,12 @@ const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700"],
+});
+
+const caveat = Caveat({
+  variable: "--font-handwritten",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -51,7 +57,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${nunito.variable} ${poppins.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${nunito.variable} ${poppins.variable} ${caveat.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col relative">
         <QueryProvider>
           <TooltipProvider>{children}</TooltipProvider>

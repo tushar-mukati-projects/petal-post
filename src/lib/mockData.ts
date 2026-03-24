@@ -1,5 +1,4 @@
 import type { FlowerType } from "@/types/flower";
-import type { WrapperType } from "@/types/floral";
 import type { ArrangementType } from "@/types/arrangement";
 import { ALL_WRAPPERS, ARRANGEMENT_TYPES } from "./constants";
 
@@ -21,15 +20,17 @@ const FLOWER_COMBOS: FlowerType[][] = [
 
 export interface MockCreation {
   id: string;
-  wrapper: WrapperType;
+  /** Compound wrapper ID: "rough_tissue", "freehand_vase", etc. */
+  wrapper: string;
   flowers: FlowerType[];
   arrangementType: ArrangementType;
   reactions: { heart: number; fire: number; sparkle: number; wow: number };
 }
 
-export const MOCK_CREATIONS: MockCreation[] = ALL_WRAPPERS.map((wrapper, i) => ({
-  id: `mock-${i + 1}`,
-  wrapper,
+// Generate mocks: rough versions + freehand versions
+const roughMocks: MockCreation[] = ALL_WRAPPERS.map((base, i) => ({
+  id: `rough-${i + 1}`,
+  wrapper: `rough_${base}`,
   flowers: FLOWER_COMBOS[i % FLOWER_COMBOS.length],
   arrangementType: ARRANGEMENT_TYPES[i % ARRANGEMENT_TYPES.length],
   reactions: {
@@ -39,3 +40,23 @@ export const MOCK_CREATIONS: MockCreation[] = ALL_WRAPPERS.map((wrapper, i) => (
     wow: (i * 2 + 1) % 6,
   },
 }));
+
+const freehandMocks: MockCreation[] = ALL_WRAPPERS.map((base, i) => ({
+  id: `freehand-${i + 1}`,
+  wrapper: `freehand_${base}`,
+  flowers: FLOWER_COMBOS[(i + 5) % FLOWER_COMBOS.length],
+  arrangementType: ARRANGEMENT_TYPES[(i + 3) % ARRANGEMENT_TYPES.length],
+  reactions: {
+    heart: 3 + ((i * 5 + 2) % 18),
+    fire: (i * 2 + 3) % 7,
+    sparkle: 1 + ((i * 4 + 1) % 10),
+    wow: (i * 3 + 2) % 5,
+  },
+}));
+
+// Interleave: rough, freehand, rough, freehand...
+export const MOCK_CREATIONS: MockCreation[] = [];
+for (let i = 0; i < Math.max(roughMocks.length, freehandMocks.length); i++) {
+  if (i < roughMocks.length) MOCK_CREATIONS.push(roughMocks[i]);
+  if (i < freehandMocks.length) MOCK_CREATIONS.push(freehandMocks[i]);
+}

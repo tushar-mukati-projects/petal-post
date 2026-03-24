@@ -16,7 +16,7 @@ interface LayoutSlot {
 // Each has 10 slots (max flowers). For fewer flowers, we use from the start.
 
 // Y offset to push flowers down closer to wrappers
-const Y_SHIFT = 40;
+const Y_SHIFT = 30;
 
 const LAYOUTS: Record<ArrangementType, LayoutSlot[]> = {
   dome: [

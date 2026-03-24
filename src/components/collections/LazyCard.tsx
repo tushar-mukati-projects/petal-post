@@ -3,6 +3,7 @@
 import { FloralRenderer } from "@/components/floral/FloralRenderer";
 import { createArrangement } from "@/lib/arrangement";
 import { WRAPPER_LABELS } from "@/flowers/wrappers";
+import { parseWrapperId } from "@/components/floral/WrapperLayer";
 import { REACTION_EMOJIS } from "@/lib/constants";
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver";
 import type { MockCreation } from "@/lib/mockData";
@@ -30,7 +31,12 @@ export function LazyCard({ mock }: LazyCardProps) {
           )}
         </div>
         <div className="p-3 flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">{WRAPPER_LABELS[mock.wrapper]}</p>
+          <p className="text-xs text-muted-foreground">
+            {WRAPPER_LABELS[parseWrapperId(mock.wrapper).base]}
+            <span className="ml-1 text-[10px] text-petal/50">
+              ({parseWrapperId(mock.wrapper).isFreehand ? "freehand" : "sketch"})
+            </span>
+          </p>
         </div>
       </div>
 

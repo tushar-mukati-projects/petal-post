@@ -9,6 +9,7 @@ import { ReactionBar } from "@/components/collections/ReactionBar";
 import { useGetFloral } from "@/hooks/queries/useGetFloral";
 import type { ArrangementData } from "@/types/arrangement";
 import type { WrapperType } from "@/types/floral";
+import { OCCASION_MAP } from "@/lib/occasions";
 import { Loader2, Flower2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { FloatingHearts } from "@/components/shared/FloatingHearts";
@@ -90,13 +91,13 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
           </motion.h1>
 
           {/* Capturable area (floral + card) */}
-          <div ref={captureRef} className="pb-4">
+          <div ref={captureRef} className="pb-4 relative">
             {/* Floral showcase */}
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-              className="relative flex justify-center"
+              className="relative flex justify-center z-10"
             >
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-80 h-80 rounded-full bg-rose-pastel/30 pointer-events-none" />
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[45%] w-72 h-72 rounded-full bg-petal-light/25 blur-xl pointer-events-none" />
@@ -120,7 +121,21 @@ export default function CreationPage({ params }: { params: Promise<{ id: string 
                 transition={{ delay: 0.7, duration: 0.6, type: "spring", stiffness: 120 }}
                 className="-mt-6 relative z-10 flex justify-center"
               >
-                <div className="bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg]">
+                <div className="relative bg-white rounded-2xl shadow-lg border border-cream-dark/60 p-6 max-w-xs rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                  {creation.occasion && (
+                    <span className="absolute -top-2 -right-2 font-handwritten text-xs font-semibold text-petal bg-petal-light/60 px-2.5 py-0.5 rounded-full rotate-[8deg] shadow-sm">
+                      {
+                        (OCCASION_MAP as Record<string, { icon: string; label: string }>)[
+                          creation.occasion
+                        ]?.icon
+                      }{" "}
+                      {
+                        (OCCASION_MAP as Record<string, { icon: string; label: string }>)[
+                          creation.occasion
+                        ]?.label
+                      }
+                    </span>
+                  )}
                   <div className="space-y-3 font-serif">
                     {creation.cardTo && (
                       <p className="text-foreground">

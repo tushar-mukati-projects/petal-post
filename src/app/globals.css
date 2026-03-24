@@ -9,6 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
   --font-heading: var(--font-nunito);
+  --font-handwritten: var(--font-handwritten);
   --font-mono: var(--font-geist-mono);
 
   /* Custom PetalPost colors */

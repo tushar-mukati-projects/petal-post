@@ -40,7 +40,7 @@ export interface Floral {
   occasion: OccasionType;
   flowers: FlowerType[];
   arrangement: ArrangementData;
-  wrapper: WrapperType;
+  wrapper: string;
   cardTo: string;
   cardMessage: string;
   cardFrom: string;
@@ -51,7 +51,7 @@ export interface CreateFloralPayload {
   occasion: OccasionType;
   flowers: FlowerType[];
   arrangement: ArrangementData;
-  wrapper: WrapperType;
+  wrapper: string;
   cardTo: string;
   cardMessage: string;
   cardFrom: string;

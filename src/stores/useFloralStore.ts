@@ -3,17 +3,36 @@
 import { create } from "zustand";
 import type { FlowerType } from "@/types/flower";
 import type { ArrangementData, ArrangementType } from "@/types/arrangement";
-import type { OccasionType, WrapperType } from "@/types/floral";
+import type { OccasionType } from "@/types/floral";
 import { createArrangement } from "@/lib/arrangement";
 import { OCCASION_MAP } from "@/lib/occasions";
 import { ARRANGEMENT_TYPES, ALL_WRAPPERS, MIN_FLOWERS, MAX_FLOWERS } from "@/lib/constants";
+
+/** Create a compound wrapper ID like "freehand_tissue" or "rough_vase" */
+function randomWrapperId(): string {
+  const base = ALL_WRAPPERS[Math.floor(Math.random() * ALL_WRAPPERS.length)];
+  const style = Math.random() > 0.5 ? "freehand" : "rough";
+  return `${style}_${base}`;
+}
+
+function randomWrapperIdFrom(exclude: string): string {
+  let id = randomWrapperId();
+  // Ensure it's different from current
+  let attempts = 0;
+  while (id === exclude && attempts < 10) {
+    id = randomWrapperId();
+    attempts++;
+  }
+  return id;
+}
 
 interface FloralState {
   currentStep: number;
   occasion: OccasionType;
   selectedFlowers: FlowerType[];
   arrangement: ArrangementData | null;
-  wrapperTheme: WrapperType;
+  /** Compound wrapper ID: "rough_tissue", "freehand_vase", etc. */
+  wrapper: string;
   cardTo: string;
   cardMessage: string;
   cardFrom: string;
@@ -28,7 +47,6 @@ interface FloralState {
   clearFlowers: () => void;
   shuffleArrangement: () => void;
   cycleWrapper: () => void;
-  setWrapper: (wrapper: WrapperType) => void;
   setCardTo: (value: string) => void;
   setCardMessage: (value: string) => void;
   setCardFrom: (value: string) => void;
@@ -41,12 +59,14 @@ const TOTAL_STEPS = 5;
 const LAST_STEP = TOTAL_STEPS - 1;
 const PICK_BLOOMS_STEP = 1;
 
+const INITIAL_WRAPPER = "rough_tissue";
+
 export const useFloralStore = create<FloralState>((set, get) => ({
   currentStep: 0,
   occasion: "none",
   selectedFlowers: [],
   arrangement: null,
-  wrapperTheme: "tissue",
+  wrapper: INITIAL_WRAPPER,
   cardTo: "",
   cardMessage: "",
   cardFrom: "",
@@ -109,12 +129,10 @@ export const useFloralStore = create<FloralState>((set, get) => ({
   },
 
   cycleWrapper: () =>
-    set((state) => {
-      const filtered = ALL_WRAPPERS.filter((w) => w !== state.wrapperTheme);
-      return { wrapperTheme: filtered[Math.floor(Math.random() * filtered.length)] };
-    }),
+    set((state) => ({
+      wrapper: randomWrapperIdFrom(state.wrapper),
+    })),
 
-  setWrapper: (wrapper) => set({ wrapperTheme: wrapper }),
   setCardTo: (value) => set({ cardTo: value }),
   setCardMessage: (value) => set({ cardMessage: value }),
   setCardFrom: (value) => set({ cardFrom: value }),
@@ -128,7 +146,7 @@ export const useFloralStore = create<FloralState>((set, get) => ({
       occasion: "none",
       selectedFlowers: preSelected,
       arrangement: null,
-      wrapperTheme: "tissue",
+      wrapper: INITIAL_WRAPPER,
       cardTo: "",
       cardMessage: "",
       cardFrom: "",
